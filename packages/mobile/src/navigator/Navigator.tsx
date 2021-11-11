@@ -47,7 +47,7 @@ import FiatExchangeOptions, {
 import ProviderOptionsScreen from 'src/fiatExchanges/ProviderOptionsScreen'
 import SimplexScreen from 'src/fiatExchanges/SimplexScreen'
 import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
-import i18n from 'src/i18n'
+import i18n, { getLanguage, initI18n } from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
 import Language from 'src/language/Language'
@@ -527,6 +527,12 @@ type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
 
 export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
+  const [isI18nInitialised, setIsI18nInitialised] = React.useState(false)
+
+  const handleI18nInit = async (language: string | null) => {
+    await initI18n(language || getLanguage())
+    setIsI18nInitialised(true)
+  }
 
   React.useEffect(() => {
     const {
@@ -538,6 +544,8 @@ export function MainStackScreen() {
       account,
       hasSeenVerificationNux,
     } = mapStateToProps(store.getState())
+
+    handleI18nInit(language)
 
     let initialRoute: InitialRouteName
 
@@ -563,7 +571,7 @@ export function MainStackScreen() {
     requestAnimationFrame(() => SplashScreen.hide())
   }, [])
 
-  if (!initialRouteName) {
+  if (!initialRouteName || !isI18nInitialised) {
     return <AppLoading />
   }
 

@@ -37,6 +37,7 @@ import {
 import { runVerificationMigration } from 'src/app/verificationMigration'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { appVersionDeprecationChannel, fetchRemoteFeatureFlags } from 'src/firebase/firebase'
+import { getLanguage } from 'src/i18n'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
@@ -66,8 +67,8 @@ const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 // Be mindful to not put long blocking tasks here
 export function* appInit() {
   const language = yield select(currentLanguageSelector)
-  if (language) {
-    yield put(setLanguage(language))
+  if (!language) {
+    yield put(setLanguage(getLanguage()))
   }
 
   const inSync = yield call(clockInSync)
